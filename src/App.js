@@ -59,9 +59,9 @@ const App = () => {
             <Link to="/" style={{ fontSize: '20px', fontWeight: 'bold', color: '#333', textDecoration: 'underline' }}>
               Menu
             </Link>
-            <Link to="/orderform" style={{ fontSize: '20px', fontWeight: 'bold', color: '#333', textDecoration: 'underline' }}>
+            {/* <Link to="/orderform" style={{ fontSize: '20px', fontWeight: 'bold', color: '#333', textDecoration: 'underline' }}>
               Place Your Order
-            </Link>
+            </Link> */}
             <Link to="/orderhistory" style={{ fontSize: '20px', fontWeight: 'bold', color: '#333', textDecoration: 'underline' }}>
               Order History
             </Link>

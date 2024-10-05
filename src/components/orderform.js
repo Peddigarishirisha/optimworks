@@ -1,8 +1,11 @@
-
 import React, { useState } from 'react';
+import { useLocation } from 'react-router-dom'; // Import useLocation
 import './orderform.css'; // Import the CSS file
 
-const OrderForm = ({ orderItems, placeOrder }) => {
+const OrderForm = () => {
+  const location = useLocation(); // Get location
+  const orderItems = location.state?.orderItems || []; // Access order items passed from Menu
+
   const [tableNumber, setTableNumber] = useState('');
   const [contactNumber, setContactNumber] = useState('');
   const [date, setDate] = useState('');
@@ -10,17 +13,32 @@ const OrderForm = ({ orderItems, placeOrder }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Calculate total_price based on orderItems
+    const total_price = Array.isArray(orderItems) 
+      ? orderItems.reduce((total, item) => {
+          // Ensure item has a price and quantity
+          const price = item.price || 0;
+          const quantity = item.quantity || 0;
+          return total + (price * quantity);
+        }, 0)
+      : 0;
+
     const orderDetails = {
       tableNumber,
       contactNumber,
       date,
       time,
-      items: orderItems, // Use the selected items here
-      order_date: new Date().toISOString(), // Add the order date
-      total_price: orderItems.reduce((total, item) => total + item.price, 0), // Calculate total price
-      status: "Pending" // Default status for new orders
+      items: orderItems,
+      order_date: new Date().toISOString(),
+      total_price,
+      status: "Pending"
     };
-    placeOrder(orderDetails); // Call the function passed from parent
+
+    // Save the order in local storage
+    const storedOrders = JSON.parse(localStorage.getItem('orders')) || [];
+    localStorage.setItem('orders', JSON.stringify([...storedOrders, orderDetails]));
+
     // Reset form fields
     setTableNumber('');
     setContactNumber('');
@@ -30,7 +48,7 @@ const OrderForm = ({ orderItems, placeOrder }) => {
 
   return (
     <div className='main'>
-      <form onSubmit={handleSubmit} className="order-form"> {/* Add the class name */}
+      <form onSubmit={handleSubmit} className="order-form">
         <h2>Place Your Order</h2>
         <label>Table Number:</label>
         <input type="text" value={tableNumber} onChange={(e) => setTableNumber(e.target.value)} required />

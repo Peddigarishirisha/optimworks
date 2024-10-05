@@ -1,24 +1,48 @@
-/* src/components/orderHistory.css */
 .order-history-container {
-    margin: 20px;
-  }
-  
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-  }
-  
-  th {
-    background-color: #f2f2f2;
-  }
-  
-  tr:hover {
-    background-color: #f1f1f1;
-  }
-  
+  max-width: 800px; /* Limit the maximum width of the container */
+  margin: 20px auto; /* Center the container with margin */
+  padding: 20px; /* Add some padding */
+  border: 1px solid #ccc; /* Light border for the container */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  background-color: #f9f9f9; /* Light background color */
+}
+
+.order-history-container h2 {
+  text-align: center; /* Center the heading */
+  color: #333; /* Dark color for the heading */
+  margin-bottom: 20px; /* Space below the heading */
+}
+
+table {
+  width: 100%; /* Make table take the full width */
+  border-collapse: collapse; /* Merge table borders */
+}
+
+th, td {
+  padding: 12px; /* Padding for table cells */
+  text-align: left; /* Align text to the left */
+  border-bottom: 1px solid #ddd; /* Light border below table cells */
+}
+
+th {
+  background-color: #007bff; /* Bootstrap primary color for header */
+  color: white; /* White text for header */
+}
+
+tbody tr:hover {
+  background-color: #f1f1f1; /* Highlight row on hover */
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f9f9f9; /* Light gray for even rows */
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #ffffff; /* White for odd rows */
+}
+
+p {
+  text-align: center; /* Center text for no orders found message */
+  color: #777; /* Gray color for text */
+}

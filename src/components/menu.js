@@ -1,34 +1,22 @@
 import React, { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import "./menu.css";
 import data from "../data/q3_data.json";
-import { CartContext } from "../context/CartContext"; // Import the CartContext
-
+import { CartContext } from "../context/CartContext";
 
 const Menu = () => {
   const [menuItems, setMenuItems] = useState(
     data.record.map((item) => ({
       ...item,
-      quantity: 0, // Initialize quantity to 0 for each item
+      quantity: 0,
     }))
   );
 
-  const { addToCart } = useContext(CartContext); // Access the cart context
-  const [showForm, setShowForm] = useState(false); // For showing the user details form
-  const [orderSuccess, setOrderSuccess] = useState(false); // For showing success message
-  const [orderDetails, setOrderDetails] = useState({
-    name: "",
-    address: "",
-    phone: "",
-  });
+  const { addToCart } = useContext(CartContext);
+  const navigate = useNavigate(); // Initialize useNavigate
 
   // Handle quantity increase
   const handleIncrease = (itemId, available_quantity) => {
-    // Check if the available quantity is less than or equal to zero
-    if (available_quantity <= 0) {
-      alert("No product available");
-      return; // Exit the function early if no product is available
-    }
-
     setMenuItems((prevMenuItems) =>
       prevMenuItems.map((item) => {
         if (item.id === itemId && item.quantity < available_quantity) {
@@ -51,68 +39,35 @@ const Menu = () => {
     );
   };
 
-  // Place order and show the form
+  // Place order and navigate to order form
   const handlePlaceOrder = () => {
-    setShowForm(true);
-  };
+    const orderItems = menuItems.filter(item => item.quantity > 0); // Get items that have been ordered
 
-  // Handle user input in the form
-  const handleInputChange = (e) => {
-    setOrderDetails({ ...orderDetails, [e.target.name]: e.target.value });
-  };
+    // Check if there are items to order
+    if (orderItems.length === 0) {
+      alert("Please add items to the order before placing an order.");
+      return;
+    }
 
-  // Submit the form and complete the order
-  // const handleOrderNow = () => {
-  //   // Reduce available quantity only if there is enough stock
-  //   setMenuItems((prevMenuItems) =>
-  //     prevMenuItems.map((item) => {
-  //       if (item.quantity > 0) {
-  //         const newQuantity = item.available_quantity - item.quantity;
-  //         return { ...item, available_quantity: Math.max(newQuantity, 0) }; // Ensure it doesn't go negative
-  //       }
-  //       return item;
-  //     })
-  //   );
-    
+    // Update available quantities based on current quantities in menuItems
+    const updatedMenuItems = menuItems.map(item => {
+      const orderedItem = orderItems.find(order => order.id === item.id);
+      if (orderedItem) {
+        return {
+          ...item,
+          available_quantity: item.available_quantity - orderedItem.quantity, // Decrease available_quantity
+        };
+      }
+      return item;
+    });
 
-  //   // Show success message and clear form
-  //   setShowForm(false);
-  //   setOrderSuccess(true);
+    setMenuItems(updatedMenuItems); // Update state with new available quantities
 
-  //   // Clear the quantities for ordered items
-  //   setMenuItems((prevMenuItems) =>
-  //     prevMenuItems.map((item) => ({
-  //       ...item,
-  //       quantity: 0, // Reset ordered items' quantity
-  //     }))
-  //   );
+    // Add items to cart context
+    orderItems.forEach(item => addToCart(item));
 
-  //   // Optionally clear the cart
-  //   localStorage.removeItem("cartItems");
-  // };
-
-  const handleOrderNow = (userDetails) => {
-    const newOrder = {
-      orderId: Date.now(), // Unique ID for the order
-      items: menuItems.filter(item => item.quantity > 0).map(item => `${item.name} (Qty: ${item.quantity})`),
-      date: new Date().toISOString(), // Current date and time
-    };
-  
-    // Fetch existing orders
-    const existingOrders = JSON.parse(localStorage.getItem('orders')) || [];
-    
-    // Add new order to existing orders
-    existingOrders.push(newOrder);
-    
-    // Save updated orders to local storage
-    localStorage.setItem('orders', JSON.stringify(existingOrders));
-    
-    alert('Order placed successfully!');
-    
-    // Reset menu items quantities if needed
-    setMenuItems(prevMenuItems =>
-      prevMenuItems.map(item => ({ ...item, quantity: 0 }))
-    );
+    // Navigate to the order form route with order items
+    navigate("/orderform", { state: { orderItems } }); // Pass order items to OrderForm
   };
 
   return (
@@ -147,12 +102,11 @@ const Menu = () => {
                   onClick={() =>
                     handleIncrease(item.id, item.available_quantity)
                   }
-                  disabled={item.quantity === item.available_quantity}
+                  disabled={item.quantity >= item.available_quantity}
                 >
                   +
                 </button>
               </div>
-              <button onClick={() => addToCart(item)}>Add to Cart</button>
             </li>
           ))
         ) : (
@@ -160,40 +114,10 @@ const Menu = () => {
         )}
       </ul>
 
-      {/* Show "Place Order" button */}
-      <button onClick={handlePlaceOrder}>Place Order</button>
-
-      {/* Show form if "Place Order" is clicked */}
-      {showForm && (
-        <div className="order-form">
-          <h3>Enter your details</h3>
-          <input
-            type="text"
-            name="name"
-            placeholder="Name"
-            value={orderDetails.name}
-            onChange={handleInputChange}
-          />
-          <input
-            type="text"
-            name="address"
-            placeholder="Address"
-            value={orderDetails.address}
-            onChange={handleInputChange}
-          />
-          <input
-            type="text"
-            name="phone"
-            placeholder="Phone"
-            value={orderDetails.phone}
-            onChange={handleInputChange}
-          />
-          <button onClick={handleOrderNow}>Order Now</button>
-        </div>
-      )}
-
-      {/* Show success message */}
-      {orderSuccess && <p>Order successfully placed!</p>}
+      {/* Show "Place Order" button and route to OrderForm */}
+      <button className="placeorder" onClick={handlePlaceOrder}>
+        Place Order
+      </button>
     </div>
   );
 };

@@ -1,5 +1,6 @@
-// src/components/OrderHistory.js
 import React, { useEffect, useState } from 'react';
+import './orderhistory.css'; // Adjust the path if necessary
+
 
 const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
@@ -18,18 +19,26 @@ const OrderHistory = () => {
           <thead>
             <tr>
               <th>Order ID</th>
-              <th>Items</th>
-              <th>Order Date</th>
-              <th>Order Time</th>
+              <th>Contact Number</th>
+              <th>Total Price</th>
+              
+              <th>Date</th>
+              <th>Time</th>
+              <th>Table Number</th>
+             
             </tr>
           </thead>
           <tbody>
             {orders.map((order, index) => (
               <tr key={index}>
-                <td>{order.orderId}</td>
-                <td>{order.items.join(', ')}</td>
-                <td>{new Date(order.date).toLocaleDateString()}</td>
-                <td>{new Date(order.date).toLocaleTimeString()}</td>
+                <td>{index + 1}</td> {/* Assuming you want a simple order ID based on index */}
+                <td>{order.contactNumber}</td>
+                <td>{order.total_price}</td>
+               
+                <td>{new Date(order.order_date).toLocaleDateString()}</td>
+                <td>{new Date(order.order_date).toLocaleTimeString()}</td>
+                <td>{order.tableNumber}</td>
+                
               </tr>
             ))}
           </tbody>
